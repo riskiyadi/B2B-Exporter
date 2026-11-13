@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B2B Global Export Negotiator</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f9; max-width: 600px; margin: auto; }
+    h2 { color: #222; margin-bottom: 5px; }
+    label { font-weight: bold; font-size: 14px; color: #444; display: block; margin-top: 15px; }
+    input, button { width: 100%; padding: 12px; margin: 8px 0 15px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 16px; }
+    button { background: #007bff; color: white; font-weight: bold; border: none; padding: 15px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    .btn-copy { background: #28a745; margin-top: 10px; display: none; }
+    .btn-copy:hover { background: #218838; }
+    #hasil { padding: 15px; background: white; border-radius: 8px; white-space: pre-wrap; font-size: 14px; line-height: 1.6; border: 1px solid #ddd; min-height: 120px; }
+    .subtitle { font-size: 13px; color: #666; margin-bottom: 20px; display: block; }
+  </style>
+</head>
+<body>
+
+  <h2>B2B Global Export Negotiator</h2>
+  <span class="subtitle">Generate professional export pitch emails instantly for buyers worldwide.</span>
+  
+  <label>Commodity / Product:</label>
+  <input type="text" id="komoditas" placeholder="e.g., Coffee Beans, Coconut Oil">
+  
+  <label>Target Country:</label>
+  <input type="text" id="negara" placeholder="e.g., Germany, United States">
+
+  <button onclick="buatProposal()">Generate Global Pitch Email</button>
+  
+  <div id="hasil">AI generated email draft will appear here...</div>
+  <button id="btnSalin" class="btn-copy" onclick="salinTeks()">Copy Email to Clipboard</button>
+
+  <script>
+    var teksMentahAI = "";
+
+    async function buatProposal() {
+      // Masukkan API Key OpenRouter Anda di antara tanda kutip di bawah ini
+      var apiKey = "MASUKKAN_API_KEY_ANDA";
+; 
+      
+      var produk = document.getElementById("komoditas").value;
+      var negara = document.getElementById("negara").value;
+      var outputDiv = document.getElementById("hasil");
+      var btnSalin = document.getElementById("btnSalin");
+
+      if (produk === "" || negara === "") {
+        outputDiv.innerHTML = "Please fill in both fields.";
+        btnSalin.style.display = "none";
+        return;
+      }
+
+      outputDiv.innerHTML = "Connecting to OpenRouter AI... Please wait.";
+      btnSalin.style.display = "none";
+
+      var instruksi = "Act as an expert B2B global export negotiator. Write a highly professional cold outreach email to pitch " + produk + " to a corporate buyer in " + negara + ". Adapt the business etiquette, formality level, and corporate culture to suit " + negara + ". Keep it concise and persuasive.";
+
+      try {
+        var respon = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + apiKey,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            "model": "deepseek/deepseek-chat", 
+            "messages": [
+              { "role": "user", "content": instruksi }
+            ]
+          })
+        });
+
+        var dataBalasan = await respon.json();
+        
+        if (!respon.ok) {
+           outputDiv.innerHTML = "OpenRouter Error: " + (dataBalasan.error ? dataBalasan.error.message : "Unknown error");
+           return;
+        }
+
+        teksMentahAI = dataBalasan.choices[0].message.content;
+        outputDiv.innerHTML = teksMentahAI;
+        btnSalin.style.display = "block";
+      } catch (error) {
+        outputDiv.innerHTML = "Network Error: " + error.message;
+      }
+    }
+
+    function salinTeks() {
+      navigator.clipboard.writeText(teksMentahAI).then(function() {
+        var btnSalin = document.getElementById("btnSalin");
+        btnSalin.innerHTML = "Copied successfully!";
+        setTimeout(function() {
+          btnSalin.innerHTML = "Copy Email to Clipboard";
+        }, 2000);
+      }, function(err) {
+        alert("Failed to copy text: " + err);
+      });
+    }
+  </script>
+<!-- Tombol Dukungan PayPal GlobalExport AI -->
+<div style="text-align: center; margin: 30px 0; padding: 20px; background: #f9f9f9; border-radius: 10px; border: 1px solid #e0e0e0;">
+  <p style="margin-bottom: 10px; font-size: 14px; color: #333; font-family: sans-serif;">
+    Enjoying this tool? Support the development of GlobalExport AI! 🚀
+  </p>
+  <a href="https://www.paypal.com/ncp/payment/S325LJESA7HQL" target="_blank" style="display: inline-block; background: #0070ba; color: white; padding: 12px 24px; text-decoration: none; border-radius: 25px; font-weight: bold; font-family: sans-serif; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    ☕ Support via PayPal ($10)
+  </a>
+</div>
+
+</body>
+</html>
+
+
